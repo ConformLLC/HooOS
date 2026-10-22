@@ -1,0 +1,87 @@
+# HooOS only (not from Twenty): opens a PR that brings the latest Twenty
+# release into main. See HOOOS.md → "Syncing with Twenty".
+name: HooOS Sync Twenty
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: "0 13 * * 1" # Mondays 13:00 UTC
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Twenty tag to sync, e.g. twenty/v2.51.0 (default: latest release on Twenty's main)"
+        required: false
+
+concurrency:
+  group: hooos-sync-twenty
+
+jobs:
+  sync:
+    if: github.repository == 'ConformLLC/HooOS'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # A PAT, not GITHUB_TOKEN: Twenty's releases change .github/workflows,
+          # and GITHUB_TOKEN may not push those. Needs Contents, Pull requests and
+          # Workflows (read/write) on ConformLLC/HooOS.
+          token: ${{ secrets.HOOOS_SYNC_TOKEN }}
+
+      - name: Pick Twenty release
+        id: pick
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          git remote add upstream https://github.com/twentyhq/twenty.git
+          git fetch upstream main --tags --force --quiet
+
+          # Feature releases (twenty/vX.Y.0) are tagged on Twenty's main; patch
+          # releases live on release branches as cherry-picks and would conflict.
+          tag="$INPUT_TAG"
+          if [ -z "$tag" ]; then
+            for t in $(git tag -l 'twenty/v*' --sort=-v:refname); do
+              if git merge-base --is-ancestor "$t" upstream/main; then tag="$t"; break; fi
+            done
+          fi
+          if [ -z "$tag" ] || ! git rev-parse --verify --quiet "$tag^{commit}" >/dev/null; then
+            echo "::error::no Twenty tag found (${tag:-none})"; exit 1
+          fi
+
+          if git merge-base --is-ancestor "$tag" origin/main; then
+            echo "main already includes $tag"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "branch=sync/${tag//\//-}" >> "$GITHUB_OUTPUT"
+          echo "count=$(git rev-list --count origin/main.."$tag")" >> "$GITHUB_OUTPUT"
+
+      - name: Open sync PR
+        if: steps.pick.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.HOOOS_SYNC_TOKEN }}
+          TAG: ${{ steps.pick.outputs.tag }}
+          BRANCH: ${{ steps.pick.outputs.branch }}
+          COUNT: ${{ steps.pick.outputs.count }}
+        run: |
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')" ]; then
+            echo "PR for $TAG already open"; exit 0
+          fi
+          # The branch is Twenty's release as-is; GitHub shows any conflicts with
+          # our changes on the PR, and merging it creates the merge commit.
+          git push --force origin "$TAG^{commit}:refs/heads/$BRANCH"
+          cat > "$RUNNER_TEMP/body.md" <<EOF
+          Brings Twenty [\`$TAG\`](https://github.com/twentyhq/twenty/releases/tag/$TAG) into HooOS ($COUNT commits).
+
+          Before merging (see HOOOS.md → Syncing with Twenty):
+          - [ ] Read the [release notes](https://github.com/twentyhq/twenty/releases/tag/$TAG) for breaking changes and migrations
+          - [ ] Resolve conflicts, checking each file listed in HOOOS.md → Changes to Twenty's code
+          - [ ] Run it locally: \`yarn\`, database migrations, start front + server, smoke test
+          - [ ] Merge with **Create a merge commit** (not squash or rebase)
+          - [ ] Tell the other dev to pull and run migrations
+          EOF
+          gh pr create --base main --head "$BRANCH" --title "Sync with Twenty $TAG" --body-file "$RUNNER_TEMP/body.md"
