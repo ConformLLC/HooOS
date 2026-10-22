@@ -5,9 +5,8 @@ name: HooOS Sync Twenty
 permissions:
   contents: read
 
+# Manual only (Actions → Run workflow): we choose when to take a Twenty release.
 on:
-  schedule:
-    - cron: "0 13 * * 1" # Mondays 13:00 UTC
   workflow_dispatch:
     inputs:
       tag:

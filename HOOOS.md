@@ -3,7 +3,7 @@
 HooOS is Conform's fork of [Twenty](https://github.com/twentyhq/twenty). We keep our own changes here and pull in Twenty's releases as they come out. Twenty's own docs (`README.md`, `CLAUDE.md`) still apply to everything that isn't ours.
 
 ```
-twentyhq/twenty ──(sync PR, weekly)──▶ ConformLLC/HooOS main ──git pull──▶ each dev's machine
+twentyhq/twenty ──(sync PR, on demand)──▶ ConformLLC/HooOS main ──git pull──▶ each dev's machine
                                           ▲
                      feature branch ──PR──┘
 ```
@@ -51,7 +51,7 @@ yarn start                                                           # front + s
 
 ## Syncing with Twenty
 
-The `HooOS Sync Twenty` workflow (`.github/workflows/hooos-sync-twenty.yaml`) runs every Monday. When Twenty has published a release that `main` doesn't include yet, it opens a PR **Sync with Twenty twenty/vX.Y.0**. To sync right away, use Actions → HooOS Sync Twenty → Run workflow; you can also give it a specific tag there.
+The `HooOS Sync Twenty` workflow (`.github/workflows/hooos-sync-twenty.yaml`) runs only when one of us starts it: Actions → HooOS Sync Twenty → Run workflow, or `gh workflow run hooos-sync-twenty.yaml -R ConformLLC/HooOS`. If Twenty has published a release that `main` doesn't include yet, it opens a PR **Sync with Twenty twenty/vX.Y.0**. Leave the tag box empty for the latest release, or enter one such as `twenty/v2.51.0`.
 
 It only takes feature releases (`twenty/vX.Y.0`). Those are tagged on Twenty's main. Patch releases (`twenty/vX.Y.1`) are cherry-picks on side branches and would conflict, and their fixes arrive with the next feature release anyway.
 
