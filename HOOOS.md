@@ -90,7 +90,24 @@ GitHub's built-in Actions token can't push changes to `.github/workflows`, and e
 
 ## Twenty's workflows in this repo
 
-The fork carries Twenty's own CI and deploy workflows. Some can't work here (deploys, translation syncs, and jobs that need Twenty's secrets or 4/8-core runners), so they're **disabled in the repo's Actions settings**, not edited, which keeps the files identical to Twenty's and avoids sync conflicts. A new workflow from a Twenty release starts out enabled; disable it in Actions if it doesn't belong here.
+The fork carries Twenty's own CI and deploy workflows. Some can't work here (deploys, translation syncs, and jobs that need Twenty's secrets or 4/8-core runners), so they're **disabled in the repo's Actions settings**, not edited, which keeps the files identical to Twenty's and avoids sync conflicts. A new workflow from a Twenty release starts out enabled; disable it in Actions if it doesn't belong here, and add it below.
+
+Disabled (Actions → pick the workflow → "Enable workflow" to turn one back on):
+
+| Workflow files | Why it can't run here |
+|---|---|
+| `cd-deploy-main`, `cd-deploy-tag`, `cd-storybook-ui` | Deploy Twenty's own environments with Twenty's dispatch key |
+| `i18n-pull`, `i18n-push`, `docs-i18n-pull`, `docs-i18n-push`, `website-i18n-pull`, `website-i18n-push` | Sync translations with Twenty's Crowdin project |
+| `claude.yml`, `pr-review-dispatch`, `preview-env-dispatch`, `visual-regression-dispatch`, `website-preview-dispatch`, `post-ci-comments`, `external-contributor-pr-auto-draft`, `app-prod-parity-e2e-dispatch` | Twenty's PR bots and test infrastructure; need Twenty's GitHub App and tokens |
+| `ci-utils` | Danger bot that congratulates first-time contributors; calls a Twenty-only service |
+| `ci-blocked-contributors` | Twenty's contributor policy (rejects AI-attributed commits); doesn't apply to our fork |
+| `ci-sensitive-paths-approval` | Requires approval from a hard-coded list of Twenty maintainers; would fail every sync PR |
+| `ci-ai-catalog-sync`, `ci-dpa-subprocessors-sync`, `ci-agent-skills-drift`, `ci-app-docs-drift` | Scheduled or bot jobs that need Twenty's API keys |
+| `ci-e2e-main`, `ci-create-app-e2e-minimal` | Need 4/8-core runners (not on our plan) and Twenty's tokens |
+
+Still on: the regular CI (`ci-front`, `ci-server`, `ci-shared`, `ci-ui`, `ci-sdk`, `ci-cli`, `ci-docs`, `ci-emails`, `ci-knip`, `ci-breaking-changes`, `ci-test-docker-compose`, …) and our `hooos-sync-twenty`. A few jobs inside `ci-front` ask for an 8-core runner and stay queued on our plan; the rest of it runs normally.
+
+If you ever send a PR upstream to Twenty, their `ci-blocked-contributors` check applies there: no AI co-author lines or "Generated with" footers in those commits and PR descriptions.
 
 ## Changes to Twenty's code
 
