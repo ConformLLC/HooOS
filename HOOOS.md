@@ -88,6 +88,29 @@ git push -u origin sync/twenty-vX.Y.0   # then open the PR into main
 
 GitHub's built-in Actions token can't push changes to `.github/workflows`, and every Twenty release has some. So the workflow uses a token stored as the repo secret **`HOOOS_SYNC_TOKEN`**: a fine-grained personal access token limited to ConformLLC/HooOS with **Contents**, **Pull requests** and **Workflows** set to read and write. When it expires, the workflow fails; make a new one and replace the secret.
 
+## If a merge breaks main
+
+Before merging, check the PR's CI: a red `ci-server-status-check` or `ci-front-status-check` means it breaks something. Don't merge a red PR, and for sync PRs wait for CI to finish.
+
+Before running migrations after a sync, back up the database. Reverting code does not undo migrations that already ran:
+
+```sh
+pg_dump "$PG_DATABASE_URL" > backup-before-twenty-vX.Y.0.sql
+```
+
+If something broken lands on `main` anyway, undo the whole merge with a new commit, through a PR like any other change:
+
+```sh
+git checkout main && git pull
+git checkout -b hooos/revert-<what>
+git revert -m 1 <merge-commit-sha>    # -m 1 keeps main's side, drops what the merge brought in
+git push -u origin hooos/revert-<what>
+```
+
+If migrations ran, restore the backup (`psql "$PG_DATABASE_URL" < backup-before-twenty-vX.Y.0.sql` into an empty database). Never force-push `main` to "undo" a merge: history is what makes reverting possible.
+
+To take a reverted sync again later, revert the revert (`git revert <revert-commit-sha>`) once the problem is fixed. Merging the same release again won't bring it back, because git already considers it merged.
+
 ## Twenty's workflows in this repo
 
 The fork carries Twenty's own CI and deploy workflows. Some can't work here (deploys, translation syncs, and jobs that need Twenty's secrets or 4/8-core runners), so they're **disabled in the repo's Actions settings**, not edited, which keeps the files identical to Twenty's and avoids sync conflicts. A new workflow from a Twenty release starts out enabled; disable it in Actions if it doesn't belong here.
