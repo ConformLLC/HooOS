@@ -3,7 +3,7 @@
 HooOS is Conform's fork of [Twenty](https://github.com/twentyhq/twenty). We keep our own changes here and pull in Twenty's releases as they come out. Twenty's own docs (`README.md`, `CLAUDE.md`) still apply to everything that isn't ours.
 
 ```
-twentyhq/twenty ──(sync PR, weekly)──▶ ConformLLC/HooOS main ──git pull──▶ each dev's machine
+twentyhq/twenty ──(sync PR, on demand)──▶ ConformLLC/HooOS main ──git pull──▶ each dev's machine
                                           ▲
                      feature branch ──PR──┘
 ```
@@ -51,7 +51,7 @@ yarn start                                                           # front + s
 
 ## Syncing with Twenty
 
-The `HooOS Sync Twenty` workflow (`.github/workflows/hooos-sync-twenty.yaml`) runs every Monday. When Twenty has published a release that `main` doesn't include yet, it opens a PR **Sync with Twenty twenty/vX.Y.0**. To sync right away, use Actions → HooOS Sync Twenty → Run workflow; you can also give it a specific tag there.
+The `HooOS Sync Twenty` workflow (`.github/workflows/hooos-sync-twenty.yaml`) runs only when one of us starts it: Actions → HooOS Sync Twenty → Run workflow, or `gh workflow run hooos-sync-twenty.yaml -R ConformLLC/HooOS`. If Twenty has published a release that `main` doesn't include yet, it opens a PR **Sync with Twenty twenty/vX.Y.0**. Leave the tag box empty for the latest release, or enter one such as `twenty/v2.51.0`.
 
 It only takes feature releases (`twenty/vX.Y.0`). Those are tagged on Twenty's main. Patch releases (`twenty/vX.Y.1`) are cherry-picks on side branches and would conflict, and their fixes arrive with the next feature release anyway.
 
@@ -87,6 +87,29 @@ git push -u origin sync/twenty-vX.Y.0   # then open the PR into main
 ### The sync token
 
 GitHub's built-in Actions token can't push changes to `.github/workflows`, and every Twenty release has some. So the workflow uses a token stored as the repo secret **`HOOOS_SYNC_TOKEN`**: a fine-grained personal access token limited to ConformLLC/HooOS with **Contents**, **Pull requests** and **Workflows** set to read and write. When it expires, the workflow fails; make a new one and replace the secret.
+
+## If a merge breaks main
+
+Before merging, check the PR's CI: a red `ci-server-status-check` or `ci-front-status-check` means it breaks something. Don't merge a red PR, and for sync PRs wait for CI to finish.
+
+Before running migrations after a sync, back up the database. Reverting code does not undo migrations that already ran:
+
+```sh
+pg_dump "$PG_DATABASE_URL" > backup-before-twenty-vX.Y.0.sql
+```
+
+If something broken lands on `main` anyway, undo the whole merge with a new commit, through a PR like any other change:
+
+```sh
+git checkout main && git pull
+git checkout -b hooos/revert-<what>
+git revert -m 1 <merge-commit-sha>    # -m 1 keeps main's side, drops what the merge brought in
+git push -u origin hooos/revert-<what>
+```
+
+If migrations ran, restore the backup (`psql "$PG_DATABASE_URL" < backup-before-twenty-vX.Y.0.sql` into an empty database). Never force-push `main` to "undo" a merge: history is what makes reverting possible.
+
+To take a reverted sync again later, revert the revert (`git revert <revert-commit-sha>`) once the problem is fixed. Merging the same release again won't bring it back, because git already considers it merged.
 
 ## Twenty's workflows in this repo
 
