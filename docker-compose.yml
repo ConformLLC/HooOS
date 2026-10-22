@@ -1,0 +1,92 @@
+# HooOS on a VPS.
+#
+# Coolify: New Resource → Docker Compose → this repo. Leave the compose
+# file as /docker-compose.yml. Assign the public domain to server port 3000.
+# Set ENCRYPTION_KEY and PG_DATABASE_PASSWORD once in Coolify and never
+# rotate ENCRYPTION_KEY, or existing workspace data cannot be read.
+# SERVER_URL is filled from Coolify's SERVICE_URL_SERVER when the domain
+# is attached. The image is built from this fork, not twentycrm/twenty.
+#
+# The first build compiles the monorepo. Give the VPS at least 8 GB of RAM.
+
+name: hooos
+
+services:
+  server:
+    build: &twenty_build
+      context: .
+      dockerfile: packages/twenty-docker/twenty/Dockerfile
+      target: twenty
+    image: hooos-twenty:deploy
+    ports:
+      - "3000:3000"
+    environment: &twenty_env
+      NODE_PORT: 3000
+      PG_DATABASE_URL: postgres://${PG_DATABASE_USER:-postgres}:${PG_DATABASE_PASSWORD}@db:5432/${PG_DATABASE_NAME:-default}
+      SERVER_URL: ${SERVER_URL:-${SERVICE_URL_SERVER:-http://localhost:3000}}
+      REDIS_URL: redis://redis:6379
+      STORAGE_TYPE: ${STORAGE_TYPE:-local}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY}
+      APP_SECRET: ${APP_SECRET:-}
+      DISABLE_DB_MIGRATIONS: "false"
+      DISABLE_CRON_JOBS_REGISTRATION: "false"
+    volumes:
+      - server-local-data:/app/packages/twenty-server/.local-storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    restart: unless-stopped
+
+  worker:
+    build: *twenty_build
+    image: hooos-twenty:deploy
+    command: ["yarn", "worker:prod"]
+    environment:
+      <<: *twenty_env
+      DISABLE_DB_MIGRATIONS: "true"
+      DISABLE_CRON_JOBS_REGISTRATION: "true"
+    volumes:
+      - server-local-data:/app/packages/twenty-server/.local-storage
+    depends_on:
+      db:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${PG_DATABASE_NAME:-default}
+      POSTGRES_USER: ${PG_DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${PG_DATABASE_PASSWORD:?set PG_DATABASE_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_DATABASE_USER:-postgres} -h localhost -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    command: ["--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  server-local-data:
