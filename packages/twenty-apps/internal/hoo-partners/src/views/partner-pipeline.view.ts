@@ -27,7 +27,7 @@ export default defineView({
   fields: [
     { universalIdentifier: 'c4d90a11-2e77-4b18-8f33-1a0b6c5d7e90', fieldMetadataUniversalIdentifier: PARTNER_NAME_FIELD_ID, position: 0, isVisible: true, size: 200 },
     { universalIdentifier: 'e6fb2c33-4099-4d3a-a155-3c2d8e7f9012', fieldMetadataUniversalIdentifier: PARTNER_PATH_FIELD_ID, position: 1, isVisible: true, size: 160 },
-    { universalIdentifier: 'f70c3d44-51aa-4e4b-b266-4d3e9f80a123', fieldMetadataUniversalIdentifier: PARTNER_WEBSITE_FIELD_ID, position: 2, isVisible: true, size: 220 },
+    { universalIdentifier: '8832f796-df6d-4e38-a8cd-aa269b05f752', fieldMetadataUniversalIdentifier: PARTNER_WEBSITE_FIELD_ID, position: 2, isVisible: true, size: 220 },
   ],
   groups: PARTNER_STAGE_OPTIONS.map((option, index) => ({
     universalIdentifier: GROUP_IDS[index],
