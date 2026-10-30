@@ -179,10 +179,24 @@ export default defineObject({
       options: [
         { id: 'e0a14a83-731b-4a50-b6bd-0b3eae0c8bc6', value: RX_STATUS_NOT_STARTED, label: 'Not started', color: 'gray', position: 0 },
         { id: 'f9896156-6de4-4a0a-8c97-f22ab72c20fe', value: 'GENERATING', label: 'Generating', color: 'yellow', position: 1 },
-        { id: '1168ff92-363c-4174-b7f0-7cc81174d2a2', value: 'PREVIEW_READY', label: 'Preview ready', color: 'blue', position: 2 },
-        { id: 'c38385e8-2ae6-41cd-be8e-e38b9a9e0cef', value: 'APPROVED', label: 'Approved', color: 'purple', position: 3 },
-        { id: '3c41bbb2-bb1a-4468-b0c6-3cad0770a948', value: 'LIVE', label: 'Live', color: 'green', position: 4 },
-        { id: 'e91304ec-7353-4672-a6f0-d374278e8c35', value: 'FAILED', label: 'Failed', color: 'red', position: 5 },
+        { id: '50728804-a02d-41a0-bd8f-364618dbd00f', value: 'BRAND_READY', label: 'Brand ready', color: 'turquoise', position: 2 },
+        { id: '1168ff92-363c-4174-b7f0-7cc81174d2a2', value: 'PREVIEW_READY', label: 'Preview ready', color: 'blue', position: 3 },
+        { id: 'c38385e8-2ae6-41cd-be8e-e38b9a9e0cef', value: 'APPROVED', label: 'Approved', color: 'purple', position: 4 },
+        { id: '3c41bbb2-bb1a-4468-b0c6-3cad0770a948', value: 'LIVE', label: 'Live', color: 'green', position: 5 },
+        { id: 'e91304ec-7353-4672-a6f0-d374278e8c35', value: 'FAILED', label: 'Failed', color: 'red', position: 6 },
+      ],
+    },
+    {
+      universalIdentifier: 'f0f33938-11dc-4a8a-a6b7-374a0be5492c',
+      type: FieldType.SELECT,
+      name: 'rxRequestedStep',
+      label: 'RX step requested',
+      description: 'Set by the Preview brand and Build site buttons; the worker call clears it.',
+      icon: 'IconPlayerPlay',
+      isNullable: true,
+      options: [
+        { id: 'b98fc71b-dd25-4b42-962b-85aebdb2a665', value: 'BRAND', label: 'Preview brand', color: 'turquoise', position: 0 },
+        { id: '86144e86-356b-48e7-b2b1-7ccec9dcde68', value: 'SITE', label: 'Build site', color: 'blue', position: 1 },
       ],
     },
     {

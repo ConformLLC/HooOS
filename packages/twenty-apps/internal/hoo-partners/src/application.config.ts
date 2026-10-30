@@ -8,4 +8,16 @@ export default defineApplication({
   displayName: 'Hoo partners',
   description:
     'Partner pipeline, treatment catalog, and the products each partner offers.',
+  serverVariables: {
+    WORKER_URL: {
+      description: 'hoo-rx worker base URL, e.g. http://localhost:8787',
+      isSecret: false,
+      isRequired: true,
+    },
+    WORKER_TOKEN: {
+      description: 'Bearer token the worker requires (WORKER_TOKEN in hoo-rx). Empty for a local worker.',
+      isSecret: true,
+      isRequired: false,
+    },
+  },
 });
