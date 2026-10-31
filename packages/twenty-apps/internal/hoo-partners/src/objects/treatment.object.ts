@@ -14,6 +14,7 @@ import {
   FAQ_ITEMS_ON_TREATMENT_FIELD_ID,
   PARTNER_TREATMENT_OBJECT_ID,
   PARTNER_TREATMENTS_ON_TREATMENT_FIELD_ID,
+  TREATMENT_DESCRIPTION_FIELD_ID,
   TREATMENT_NAME_FIELD_ID,
   TREATMENT_OBJECT_ID,
   TREATMENT_ON_CITATION_FIELD_ID,
@@ -23,24 +24,14 @@ import {
 } from 'src/constants/identifiers';
 import { answerField, contentStatusFields, seoFields, slugField } from 'src/utils/content-fields';
 
-const list = (universalIdentifier: string, name: string, label: string, description: string, icon: string) => ({
-  universalIdentifier,
-  type: FieldType.ARRAY as const,
-  name,
-  label,
-  description,
-  icon,
-  isNullable: true as const,
-});
-
 export default defineObject({
   universalIdentifier: TREATMENT_OBJECT_ID,
   nameSingular: 'treatment',
   namePlural: 'treatments',
-  labelSingular: 'Treatment',
-  labelPlural: 'Treatments',
+  labelSingular: 'Product',
+  labelPlural: 'Products',
   description:
-    'Hoo’s catalog. Each treatment is one program page on every partner site that offers it; the copy here is the approved copy.',
+    'Hoo’s catalog. One record per product, shared by every partner site that sells it; partners only set their own price and intake link.',
   icon: 'IconFlask',
   labelIdentifierFieldMetadataUniversalIdentifier: TREATMENT_NAME_FIELD_ID,
   fields: [
@@ -119,13 +110,16 @@ export default defineObject({
     },
     ...seoFields('52d8b64e-24b0-4491-bb42-d2fe9cf2ea40', '4e187164-5793-4e20-8b5b-07757534b9cd'),
     answerField('c6c1294f-b33e-40a2-b5d9-f22474418a28'),
-    list('91e4d092-0ae1-4ea5-a56a-ceaf806073ff', 'what', 'What it is', 'Paragraphs.', 'IconInfoCircle'),
-    list('06fd1634-5236-4857-a138-8e11ff234294', 'whoFor', 'Who it is for', 'Bullet points.', 'IconUsers'),
-    list('4e157c1b-6591-4938-bf06-be8da79eea83', 'howItWorks', 'How it works', 'Steps, in order.', 'IconListNumbers'),
-    list('e61debeb-8d42-46c3-90e5-98a6c36c4a3f', 'included', 'What is included', 'Bullet points.', 'IconPackage'),
-    list('b6b790bf-5847-45d1-8c87-da1270c9ceea', 'notFor', 'Not for', 'Safety: who should not use it.', 'IconAlertTriangle'),
-    list('8618ba4f-d8b6-4388-a3ed-882a8add1a51', 'sideEffects', 'Side effects', 'Safety: common side effects.', 'IconAlertCircle'),
-    list('b503c946-9513-4733-ad38-580fb5247600', 'safetyNotes', 'Safety notes', 'Safety: anything else.', 'IconShieldCheck'),
+    {
+      universalIdentifier: TREATMENT_DESCRIPTION_FIELD_ID,
+      type: FieldType.RICH_TEXT,
+      name: 'description',
+      label: 'Description',
+      description:
+        'The product page copy, under fixed headings: What it is, Who it’s for, How it works, What’s included, Who should not use it, Side effects, Safety notes.',
+      icon: 'IconFileText',
+      isNullable: true,
+    },
     {
       universalIdentifier: '71fe1996-0dbf-481d-8df4-133d68bb51d0',
       type: FieldType.FILES,
@@ -141,7 +135,7 @@ export default defineObject({
       type: FieldType.BOOLEAN,
       name: 'active',
       label: 'Active',
-      description: 'Off hides the treatment from every partner site.',
+      description: 'Off hides the product from every partner site.',
       icon: 'IconCheck',
       defaultValue: true,
     },
