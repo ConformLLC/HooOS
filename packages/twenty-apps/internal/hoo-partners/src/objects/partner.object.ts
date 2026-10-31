@@ -370,6 +370,25 @@ export default defineObject({
       isNullable: true,
     },
     {
+      universalIdentifier: '6e5d4a26-fd51-4742-941d-213d3aa5d30f',
+      type: FieldType.TEXT,
+      name: 'heroHeadline',
+      label: 'Hero headline',
+      description:
+        'Optional, at most 80 characters; *stars* stress words. Empty uses the shared hero from the site designer. Must pass the copy rules.',
+      icon: 'IconHeading',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: '1e7dfdce-6225-490e-9338-13602a945c6d',
+      type: FieldType.TEXT,
+      name: 'heroBody',
+      label: 'Hero text',
+      description: 'Optional, at most 240 characters, under the headline. Empty uses the shared hero.',
+      icon: 'IconAlignLeft',
+      isNullable: true,
+    },
+    {
       universalIdentifier: CONTENT_OPT_OUTS_ON_PARTNER_FIELD_ID,
       type: FieldType.RELATION,
       name: 'contentOptOuts',
