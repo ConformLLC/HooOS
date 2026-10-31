@@ -5,9 +5,9 @@ import {
   type ObjectRecordUpdateEvent,
 } from 'twenty-sdk/define';
 
-type PartnerRecord = { id: string; rxRequestedStep: 'BRAND' | 'SITE' | null };
+type PartnerRecord = { id: string; rxRequestedStep: 'BRAND' | 'SITE' | 'PUBLISH' | null };
 
-const STEPS = { BRAND: 'brand', SITE: 'site' } as const;
+const STEPS = { BRAND: 'brand', SITE: 'site', PUBLISH: 'publish' } as const;
 
 const handler = async (
   payload: DatabaseEventPayload<ObjectRecordUpdateEvent<PartnerRecord>>,
