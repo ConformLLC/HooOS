@@ -86,5 +86,15 @@ export default defineObject({
       icon: 'IconAlertCircle',
       isNullable: true,
     },
+    {
+      universalIdentifier: '86e7cec9-e87c-4666-a6b7-75b9d95b489f',
+      type: FieldType.RAW_JSON,
+      name: 'homeTemplate',
+      label: 'Home page template',
+      description:
+        'The home page every partner site shares, saved by the site designer. Publish content sends it to the sites.',
+      icon: 'IconLayout',
+      isNullable: true,
+    },
   ],
 });
