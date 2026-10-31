@@ -8,6 +8,7 @@ export default defineApplication({
   displayName: 'Hoo partners',
   description:
     'Partner pipeline, treatment catalog, and the products each partner offers.',
+  logoUrl: 'public/hoo-logo.svg',
   // Workspace-level, so they are set in Settings > Applications rather than by the server admin.
   applicationVariables: {
     WORKER_URL: {
