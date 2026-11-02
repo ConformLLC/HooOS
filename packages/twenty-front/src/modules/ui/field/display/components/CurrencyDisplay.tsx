@@ -17,9 +17,11 @@ import { EllipsisDisplay } from '@/ui/field/display/components/internal/Ellipsis
 import { TooltipDelay } from '@/ui/layout/tooltip/constants/TooltipDelay';
 import { DEFAULT_DECIMAL_VALUE } from '@/localization/utils/formatNumber';
 
+// Inline, so the amount stays on the same line inside the one-line truncating cell.
 const StyledCurrencyIconContainer = styled.span`
   align-items: center;
-  display: flex;
+  display: inline-flex;
+  vertical-align: middle;
 `;
 
 type CurrencyDisplayProps = {

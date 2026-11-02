@@ -1,0 +1,86 @@
+import {
+  defineObject,
+  FieldType,
+  OnDeleteAction,
+  RelationType,
+} from 'twenty-sdk/define';
+
+import {
+  ARTICLE_OBJECT_ID,
+  ARTICLE_ON_CONTENT_OPT_OUT_FIELD_ID,
+  CONTENT_OPT_OUT_NAME_FIELD_ID,
+  CONTENT_OPT_OUT_OBJECT_ID,
+  CONTENT_OPT_OUTS_ON_ARTICLE_FIELD_ID,
+  CONTENT_OPT_OUTS_ON_PARTNER_FIELD_ID,
+  CONTENT_OPT_OUTS_ON_TOPIC_FIELD_ID,
+  PARTNER_OBJECT_ID,
+  PARTNER_ON_CONTENT_OPT_OUT_FIELD_ID,
+  TOPIC_OBJECT_ID,
+  TOPIC_ON_CONTENT_OPT_OUT_FIELD_ID,
+} from 'src/constants/identifiers';
+
+export default defineObject({
+  universalIdentifier: CONTENT_OPT_OUT_OBJECT_ID,
+  nameSingular: 'contentOptOut',
+  namePlural: 'contentOptOuts',
+  labelSingular: 'Content opt-out',
+  labelPlural: 'Content opt-outs',
+  description: 'Content a partner does not publish. Everything else approved reaches their site.',
+  icon: 'IconEyeOff',
+  labelIdentifierFieldMetadataUniversalIdentifier: CONTENT_OPT_OUT_NAME_FIELD_ID,
+  fields: [
+    {
+      universalIdentifier: CONTENT_OPT_OUT_NAME_FIELD_ID,
+      type: FieldType.TEXT,
+      name: 'name',
+      label: 'Name',
+      description: 'Optional note, e.g. "No hair content".',
+      icon: 'IconAbc',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: PARTNER_ON_CONTENT_OPT_OUT_FIELD_ID,
+      type: FieldType.RELATION,
+      name: 'partner',
+      label: 'Partner',
+      icon: 'IconBuildingSkyscraper',
+      relationTargetObjectMetadataUniversalIdentifier: PARTNER_OBJECT_ID,
+      relationTargetFieldMetadataUniversalIdentifier: CONTENT_OPT_OUTS_ON_PARTNER_FIELD_ID,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.CASCADE,
+        joinColumnName: 'partnerId',
+      },
+    },
+    {
+      universalIdentifier: TOPIC_ON_CONTENT_OPT_OUT_FIELD_ID,
+      type: FieldType.RELATION,
+      name: 'topic',
+      label: 'Topic',
+      icon: 'IconTags',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: TOPIC_OBJECT_ID,
+      relationTargetFieldMetadataUniversalIdentifier: CONTENT_OPT_OUTS_ON_TOPIC_FIELD_ID,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.CASCADE,
+        joinColumnName: 'topicId',
+      },
+    },
+    {
+      universalIdentifier: ARTICLE_ON_CONTENT_OPT_OUT_FIELD_ID,
+      type: FieldType.RELATION,
+      name: 'article',
+      label: 'Article',
+      icon: 'IconArticle',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: ARTICLE_OBJECT_ID,
+      relationTargetFieldMetadataUniversalIdentifier: CONTENT_OPT_OUTS_ON_ARTICLE_FIELD_ID,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.CASCADE,
+        joinColumnName: 'articleId',
+      },
+    },
+  ],
+});
