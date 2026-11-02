@@ -132,6 +132,18 @@ Still on: the regular CI (`ci-front`, `ci-server`, `ci-shared`, `ci-ui`, `ci-sdk
 
 If you ever send a PR upstream to Twenty, their `ci-blocked-contributors` check applies there: no AI co-author lines or "Generated with" footers in those commits and PR descriptions.
 
+## Trimming Twenty to what Hoo uses
+
+We keep Twenty's features out of the way with settings, not by deleting code, so syncs stay clean. The Docker image already builds only the server and front; the website, docs, Zapier and example apps in `packages/` never ship.
+
+1. **Env**: `docker-compose.yml` turns off telemetry, icon lookups, Google and Microsoft sign-in, and email and calendar sync, and keeps one workspace. `AI_PROVIDERS` stays unset.
+2. **Workspace**: after the first login and the hoo-partners sync, run once (and again after a Twenty sync if the sidebar looks off):
+   ```sh
+   python3 packages/twenty-apps/internal/hoo-partners/scripts/clean-workspace.py --url https://<crm-domain> --dry-run
+   python3 packages/twenty-apps/internal/hoo-partners/scripts/clean-workspace.py --url https://<crm-domain>
+   ```
+   It turns off public invite links, Google and Microsoft sign-in, message import and campaign tracking, and orders the sidebar: Partners, Treatments, People, Companies, Opportunities, Tasks, Notes, Dashboards, Workflows. Other workspace menu items are kept unless you pass `--prune`. It uses the API key in `~/.twenty/config.json` (`remotes.hoo`) or `TWENTY_API_KEY`.
+
 ## Changes to Twenty's code
 
 Every Twenty file we've modified, so sync conflicts are quick to place. Add a row in the same PR as the change.

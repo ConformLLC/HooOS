@@ -30,6 +30,20 @@ services:
       APP_SECRET: ${APP_SECRET:-}
       DISABLE_DB_MIGRATIONS: "false"
       DISABLE_CRON_JOBS_REGISTRATION: "false"
+      # Features Hoo doesn't use. Pinned so a Twenty release can't turn them on.
+      TELEMETRY_ENABLED: "false"
+      ANALYTICS_ENABLED: "false"
+      ALLOW_REQUESTS_TO_TWENTY_ICONS: "false"
+      IS_MULTIWORKSPACE_ENABLED: "false"
+      IS_WORKSPACE_CREATION_LIMITED_TO_SERVER_ADMINS: "true"
+      SIGN_IN_PREFILLED: "false"
+      AUTH_GOOGLE_ENABLED: "false"
+      AUTH_MICROSOFT_ENABLED: "false"
+      IS_IMAP_SMTP_CALDAV_ENABLED: "false"
+      MESSAGING_PROVIDER_GMAIL_ENABLED: "false"
+      MESSAGING_PROVIDER_MICROSOFT_ENABLED: "false"
+      CALENDAR_PROVIDER_GOOGLE_ENABLED: "false"
+      CALENDAR_PROVIDER_MICROSOFT_ENABLED: "false"
     volumes:
       - server-local-data:/app/packages/twenty-server/.local-storage
     depends_on:
